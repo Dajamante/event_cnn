@@ -204,7 +204,7 @@ class Trainer(BaseTrainer):
                 if output is not None:
                     video_tensor = make_tc_vis(output[1])
                     self.writer.add_video(f'warp_vis/tc_{tag_prefix}',
-                            video_tensor, global_step=epoch, fps=2)
+                            video_tensor, epoch, 2)
                     break
 
         vw_loss_ftn = self.get_loss_ftn('voxel_warp_flow_loss')
@@ -214,7 +214,7 @@ class Trainer(BaseTrainer):
                 if output is not None:
                     video_tensor = make_vw_vis(output[1])
                     self.writer.add_video(f'warp_vox/tc_{tag_prefix}',
-                            video_tensor, global_step=epoch, fps=1)
+                            video_tensor, epoch, 1)
                     break
 
         non_zero_voxel = torch.stack([s['events'] for s in sequence])
@@ -232,7 +232,7 @@ class Trainer(BaseTrainer):
         self.writer.add_histogram(f'{tag_prefix}_image/prediction',
                                   torch.stack(pred_images))
         video_tensor = make_flow_movie(event_previews, pred_images, images, pred_flows, flows)
-        self.writer.add_video(f'{tag_prefix}', video_tensor, global_step=epoch, fps=20)
+        self.writer.add_video(f'{tag_prefix}', video_tensor, epoch, 20)
 
     def get_loss_ftn(self, loss_name):
         for loss_ftn in self.loss_ftns:
