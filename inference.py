@@ -70,7 +70,8 @@ def main(args, model):
     dataset_kwargs = {'transforms': {},
                       'max_length': None,
                       'sensor_resolution': None,
-                      'num_bins': 5,
+                      #'num_bins': 5,
+                      'num_bins': 10,
                       'filter_hot_events': args.filter_hot_events,
                       'voxel_method': {'method': args.voxel_method,
                                        'k': args.k,
@@ -87,6 +88,7 @@ def main(args, model):
         dataset_kwargs['transforms'] = {'LegacyNorm': {}}
 
     data_loader = InferenceDataLoader(args.events_file_path, dataset_kwargs=dataset_kwargs, ltype=args.loader_type)
+    #print(dataset_kwargs)
 
     height, width = get_height_width(data_loader)
 
@@ -94,10 +96,11 @@ def main(args, model):
     crop = CropParameters(width, height, model.num_encoders)
 
     ts_fname = setup_output_folder(args.output_folder)
-    
+
     model.reset_states()
     for i, item in enumerate(tqdm(data_loader)):
         voxel = item['events'].to(device)
+        #print(voxel)
         if not args.color:
             voxel = crop.pad(voxel)
         with CudaTimer('Inference'):
@@ -171,7 +174,7 @@ if __name__ == '__main__':
                         help='set required parameters to run legacy firenet as described in Scheerlinck20WACV (not for retrained models using updated code)')
 
     args = parser.parse_args()
-    
+
     if args.device is not None:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.device
     print('Loading checkpoint: {} ...'.format(args.checkpoint_path))
